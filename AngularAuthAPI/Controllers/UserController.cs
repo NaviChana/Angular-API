@@ -6,13 +6,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Data;
+using System.Data.SqlClient;
+using System.Configuration;
+using Microsoft.Data.SqlClient;
 
 namespace AngularAuthAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/controller")]
     [ApiController]
     public class UserController : ControllerBase
     {
+
         private readonly AppDbContext _appDbContext;
 
         public UserController(AppDbContext appDbContext)
@@ -33,7 +38,7 @@ namespace AngularAuthAPI.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> RegisterUser([FromBody] User userObject)
+        public async Task<IActionResult> RegisterUser( User userObject)
         {
             if (userObject == null)
                 return BadRequest();
@@ -50,15 +55,13 @@ namespace AngularAuthAPI.Controllers
             var pass = CheckPasswordStrength(userObject.Password);
 
             if (!string.IsNullOrEmpty(pass))
-                return BadRequest(new { Message = pass.ToString() } );
+                return BadRequest(new { Message = pass.ToString() });
 
             userObject.Password = PasswordHash.HashPassword(userObject.Password);
-            userObject.Role = "User";
-            userObject.Token = "";
             await _appDbContext.Users.AddAsync(userObject);
             await _appDbContext.SaveChangesAsync();
 
-            return Ok( new { Message = "Registration was a success!" });
+            return Ok(new { Message = "Registration was a success!" });
         }
 
         private Task<bool> CheckUsernameExists(string username)

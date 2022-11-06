@@ -1,5 +1,6 @@
 using AngularAuthAPI.Context;
 using Microsoft.EntityFrameworkCore;
+using System.Web.Http.Cors;
 
 var builder = WebApplication.CreateBuilder(args);
 
